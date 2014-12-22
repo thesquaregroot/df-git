@@ -15,6 +15,16 @@ In this way, once you've set up `df-git` you should only need to call
 `df-start.sh` whenever you want to play Dwarf Fortress and the rest should
 happen automatically.
 
+Dependencies
+------------
+
+You'll need the following to run df-git:
+
+- `Dwarf Fortress`
+  - This, so far, is only tested on my Arch Linux system with `multilib/dwarffortress`.
+- `git`
+- `bash` (or potentially some other shell)
+
 Installation
 ------------
 
