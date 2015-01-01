@@ -7,6 +7,7 @@ function print_usage() {
     echo "  $0 pull"
     echo "  $0 commit <commit-message>"
     echo "  $0 push"
+    echo "  $0 upgrade-config"
 }
 
 ##
@@ -24,11 +25,19 @@ DF_DIR_NAME=".dwarffortress"
 DF_DIR="${HOME}/${DF_DIR_NAME}/"
 DF_GIT_DIR_NAME=".df-git"
 DF_GIT_DIR="${HOME}/${DF_GIT_DIR_NAME}/"
+DF_BIN="dwarffortress"
 alias cp="cp -v"
 alias mv="mv -v"
 alias rm="rm -Iv"
+function remove_df_dir() {
+    if [[ -e "${DF_DIR}" ]]; then
+        echo "Removing ${DF_DIR}..."
+        rm -rf "${DF_DIR}"
+    fi
+}
 function remove_df_git_dir() {
     if [[ -e "${DF_GIT_DIR}" ]]; then
+        echo "Removing ${DF_GIT_DIR}..."
         rm -rf "${DF_GIT_DIR}"
     fi
 }
@@ -43,9 +52,11 @@ function copy_files() {
     cp -r "${src_dir}/data/save/" "${dest_dir}/data/"
 }
 function install_df_git_files() {
+    echo "Installing df-git files..."
     copy_files "${DF_GIT_DIR}" "${DF_DIR}"
 }
 function update_df_git_files() {
+    echo "Updating df-git files..."
     copy_files "${DF_DIR}" "${DF_GIT_DIR}"
 }
 function confirm_update() {
@@ -122,6 +133,18 @@ case "$cmd" in
     fi
     cd "${DF_GIT_DIR}"
     git push
+    ;;
+"upgrade-config")
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: $0 $cmd"
+        exit 1
+    fi
+    # remove dwarf fortress directory
+    remove_df_dir
+    # start dwarf fortress long enough to create new config
+    timeout -s 9 1s "${DF_BIN}"
+    # add save files
+    install_df_git_files
     ;;
 *)
     echo "Unrecognized command \"$cmd\"."
