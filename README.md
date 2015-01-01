@@ -69,3 +69,21 @@ If you have multiple computers, setting up `df-git` and using `df-start.sh` to
 run Dwarf Fortress every time will ensure that you always have the most recent
 version of your fortress.
 
+***upgrade-config***
+
+The `upgrade-config` command automates the process for restarting configuration
+after an upgrade to Dwarf Fortress.  The .dwarffortress directory is deleted
+and Dwarf Fortress is started briefly, allowing the new version's
+configuration files to be copied into place.  Any save files currently being
+tracked by `df-git` will then be copied into place.
+
+Assuming `df-git` is already set up and in sync, the following commands should
+start up Dwarf Fortress with new configuration and your old save files:
+
+```
+$ df-git.sh upgrade-config
+$ df-start.sh
+```
+
+That said, this is heavily dependent on specific functionality and may be an
+opportunity for real-world [Fun](http://dwarffortresswiki.org/index.php/DF2014:Fun).
