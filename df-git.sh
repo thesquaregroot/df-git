@@ -49,7 +49,7 @@ function update_df_git_files() {
     copy_files "${DF_DIR}" "${DF_GIT_DIR}"
 }
 function confirm_update() {
-    read -p "Are you sure you wnat to update your Dwarf Fortress configuration? [y/N] " response
+    read -p "Remote changes found, are you sure you want to overwrite your local Dwarf Fortress save files? [y/N] " response
     if [[ "$response" == "y" ]]; then
         return 0
     fi
