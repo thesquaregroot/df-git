@@ -2,12 +2,20 @@
 
 function print_usage() {
     echo "Usage: "
-    echo "  $0 help"
+    echo
+    echo "Commands with custom implementations:"
     echo "  $0 clone <repo-location>"
-    echo "  $0 pull"
     echo "  $0 commit <commit-message>"
+    echo "  $0 help"
+    echo "  $0 pull"
     echo "  $0 push"
     echo "  $0 upgrade-config"
+    echo
+    echo "Commands 'forwarded' to git:"
+    echo "  $0 branch <normal-git arguments>"
+    echo "  $0 checkout <normal-git-arguments>"
+    echo "  $0 fetch <normal-git-arguments>"
+    echo "  $0 status <normal-git arguments>"
 }
 
 ##
@@ -68,6 +76,7 @@ function confirm_update() {
 }
 
 cmd="$1"
+current_branch="`git symbolic-ref --short HEAD`" # e.g. 'master'
 ##
 ## Interpret and execute command
 ##
@@ -80,6 +89,7 @@ case "$cmd" in
     fi
     repo="$2"
     remove_df_git_dir
+    # clone to home directory
     cd "${HOME}"
     git clone "$repo" "${DF_GIT_DIR_NAME}"
     # init .gitignore
@@ -100,12 +110,12 @@ case "$cmd" in
         echo "Usage: $0 $cmd"
         exit 1
     fi
-    cd ${DF_GIT_DIR}
+    cd "${DF_GIT_DIR}"
     git fetch origin
-    changes="$(git log HEAD..origin/master --oneline)"
+    changes="`git log HEAD..origin/${current_branch} --oneline`"
     if [[ -n "$changes" ]] && [[ confirm_update ]]; then
         # changes found, update files
-        git pull
+        git pull origin ${current_branch}
         # setup updated files
         install_df_git_files
     fi
@@ -132,7 +142,13 @@ case "$cmd" in
         exit 1
     fi
     cd "${DF_GIT_DIR}"
-    git push
+    git push origin ${current_branch}
+    ;;
+"branch"|"checkout"|"fetch"|"status")
+    # direct forward
+    cd "${DF_GIT_DIR}"
+    update_df_git_files
+    git $@
     ;;
 "upgrade-config")
     if [[ $# -ne 1 ]]; then
