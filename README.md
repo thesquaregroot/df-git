@@ -87,3 +87,12 @@ $ df-start.sh
 
 That said, this is heavily dependent on specific functionality and may be an
 opportunity for real-world [Fun](http://dwarffortresswiki.org/index.php/DF2014:Fun).
+
+***force-state***
+
+The `force-state` command provides a way to take the current state of the
+repository and overwrite your Dwarf Fortress save files with it.  This is
+especially useful if you have interacted with the repository outside of df-git
+(e.g. with git itself) or if there has otherwise been corruption of your Dwarf
+Fortress save directory.
+

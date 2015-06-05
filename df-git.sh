@@ -1,21 +1,24 @@
 #!/bin/bash
 
 function print_usage() {
-    echo "Usage: "
+    echo "Usage: $0 <command> [<arguments>]"
     echo
     echo "Commands with custom implementations:"
-    echo "  $0 clone <repo-location>"
-    echo "  $0 commit <commit-message>"
-    echo "  $0 help"
-    echo "  $0 pull"
-    echo "  $0 push"
-    echo "  $0 upgrade-config"
+    echo "  clone <repo-location>       Clones a remote repository"
+    echo "  commit <commit-message>     Adds and commits the current changes"
+    echo "  force-state                 Overwrites dwarf fortress save files with"
+    echo "                                  repository state"
+    echo "  help                        Prints this help screen"
+    echo "  pull                        Updates the repository with remote changes"
+    echo "  push                        Uploads changes to the remote repository"
+    echo "  upgrade-config              Re-creates the dwarf fortress directory and"
+    echo "                                  re-installs save files"
     echo
-    echo "Commands 'forwarded' to git:"
-    echo "  $0 branch <normal-git arguments>"
-    echo "  $0 checkout <normal-git-arguments>"
-    echo "  $0 fetch <normal-git-arguments>"
-    echo "  $0 status <normal-git arguments>"
+    echo "Commands 'forwarded' to git (normal git arguments can be used):"
+    echo "  branch"
+    echo "  checkout"
+    echo "  fetch"
+    echo "  status"
 }
 
 ##
@@ -110,6 +113,29 @@ case "$cmd" in
     echo "!data/save/"         >> "${DF_GIT_DIR}/.gitignore"
     echo "!data/save/**/*"     >> "${DF_GIT_DIR}/.gitignore"
     ;;
+# COMMIT LATEST CHANGES
+"commit")
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: $0 $cmd <commit-message>"
+        exit 1
+    fi
+    msg="$2"
+    cd "${DF_GIT_DIR}"
+    # get any changes
+    update_df_git_files
+    # add updates
+    git add -A
+    # commit
+    git commit -m "$msg"
+    ;;
+# FORCES REPOSITORY STATE TO CONFIGURATION
+"force-state")
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: $0 $cmd"
+        exit 1
+    fi
+    install_df_git_files
+    ;;
 # PULL UPDATES FROM CURRENT BRANCH
 "pull")
     if [[ $# -ne 1 ]]; then
@@ -126,21 +152,6 @@ case "$cmd" in
         install_df_git_files
     fi
     ;;
-# COMMIT LATEST CHANGES
-"commit")
-    if [[ $# -ne 2 ]]; then
-        echo "Usage: $0 $cmd <commit-message>"
-        exit 1
-    fi
-    msg="$2"
-    cd "${DF_GIT_DIR}"
-    # get any changes
-    update_df_git_files
-    # add updates
-    git add -A
-    # commit
-    git commit -m "$msg"
-    ;;
 # PUSH BRANCH TO REPOSITORY
 "push")
     if [[ $# -ne 1 ]]; then
@@ -150,23 +161,28 @@ case "$cmd" in
     cd "${DF_GIT_DIR}"
     git push origin ${current_branch}
     ;;
-"branch"|"checkout"|"fetch"|"status")
-    # direct forward
-    cd "${DF_GIT_DIR}"
-    update_df_git_files
-    git $@
-    ;;
+# RECREATE DWARF FORTRESS CONFIGURATION
 "upgrade-config")
     if [[ $# -ne 1 ]]; then
         echo "Usage: $0 $cmd"
         exit 1
     fi
+    # make sure we have the most recent updates
+    update_df_git_files
     # remove dwarf fortress directory
+    echo "Recreating ${DF_DIR}..."
     remove_df_dir
     # start dwarf fortress long enough to create new config
     timeout -s 9 1s "${DF_BIN}"
     # add save files
     install_df_git_files
+    ;;
+# FORWARDED COMMANDS
+"branch"|"checkout"|"fetch"|"status")
+    # direct forward
+    cd "${DF_GIT_DIR}"
+    update_df_git_files
+    git $@
     ;;
 *)
     echo "Unrecognized command \"$cmd\"."
