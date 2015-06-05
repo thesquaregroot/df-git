@@ -52,12 +52,18 @@ function remove_df_git_dir() {
 function copy_files() {
     src_dir="$1"
     dest_dir="$2"
-    # remove destination
-    rm -rf "${dest_dir}/data/save/"
-    # create directories
-    mkdir -p "${dest_dir}/data/"
-    # copy files
-    cp -r "${src_dir}/data/save/" "${dest_dir}/data/"
+    # determine if rysnc is installed
+    if hash rsync 2>/dev/null; then
+        # sync files
+        rsync -rtq -delete "${src_dir}" "${dest_dir}"
+    else
+        # remove destination
+        rm -rf "${dest_dir}/data/save/"
+        # create directories
+        mkdir -p "${dest_dir}/data/"
+        # copy files
+        cp -r "${src_dir}/data/save/" "${dest_dir}/data/"
+    fi
 }
 function install_df_git_files() {
     echo "Installing df-git files..."
