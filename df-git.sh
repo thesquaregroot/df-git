@@ -58,7 +58,7 @@ function copy_files() {
     # determine if rysnc is installed
     if hash rsync 2>/dev/null; then
         # sync files
-        rsync -rtq -delete "${src_dir}" "${dest_dir}"
+        rsync -rtq -delete "${src_dir}" "${dest_dir}" --exclude ".git"
     else
         # remove destination
         rm -rf "${dest_dir}/data/save/"
