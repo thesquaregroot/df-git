@@ -190,6 +190,7 @@ case "$cmd" in
     cd "${DF_GIT_DIR}"
     update_df_git_files
     git $@
+    install_df_git_files
     ;;
 *)
     echo "Unrecognized command \"$cmd\"."
