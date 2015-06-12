@@ -18,7 +18,9 @@ function print_usage() {
     echo "  branch"
     echo "  checkout"
     echo "  fetch"
+    echo "  log"
     echo "  status"
+    echo
 }
 
 ##
@@ -178,7 +180,7 @@ case "$cmd" in
     install_df_git_files
     ;;
 # FORWARDED COMMANDS
-"branch"|"checkout"|"fetch"|"status")
+"branch"|"checkout"|"fetch"|"status"|"log")
     # direct forward
     cd "${DF_GIT_DIR}"
     update_df_git_files
