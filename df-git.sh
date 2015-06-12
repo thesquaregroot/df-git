@@ -85,9 +85,12 @@ function confirm_update() {
     fi
     return 1
 }
+function get_current_branch() {
+    cd ${DF_GIT_DIR}
+    git symbolic-ref --short HEAD # e.g. 'master'
+}
 
 cmd="$1"
-current_branch="`git symbolic-ref --short HEAD`" # e.g. 'master'
 ##
 ## Interpret and execute command
 ##
@@ -146,7 +149,8 @@ case "$cmd" in
     fi
     cd "${DF_GIT_DIR}"
     git fetch origin
-    changes="`git log HEAD..origin/${current_branch} --oneline`"
+    current_branch=$(get_current_branch)
+    changes="$(git log HEAD..origin/${current_branch} --oneline)"
     if [[ -n "$changes" ]] && [[ confirm_update ]]; then
         # changes found, update files
         git pull origin ${current_branch}
@@ -161,6 +165,7 @@ case "$cmd" in
         exit 1
     fi
     cd "${DF_GIT_DIR}"
+    current_branch=$(get_current_branch)
     git push origin ${current_branch}
     ;;
 # RECREATE DWARF FORTRESS CONFIGURATION
