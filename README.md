@@ -40,8 +40,15 @@ export PATH="$PATH:/path/to/df-git/"
 Using df-git
 ------------
 
-You will first want to create a remote repository (preferably one you can access
-from anywhere).  Once this is create you can clone it using:
+The first time you use df-git, it will attempt to find the Dwarf Fortress
+binary.  If you have installed it manually it will likely print an error telling
+you to configure it, which you can do with the following command:
+
+    $ df-git.sh setup /path/to/df-binary
+
+Once df-git knows the binary location, you will want to create a remote
+repository (preferably one you can access from anywhere).  Once this is created
+you can clone it using:
 
     $ df-git.sh clone <repo-location>
 

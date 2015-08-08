@@ -7,7 +7,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # run dwarf fortress
-dwarffortress
+$(df-git.sh get-binary-path)
 
 # auto-commit
 df-git.sh commit "[$(date +"%Y-%m-%d %H:%M:%S")] auto-commit"
