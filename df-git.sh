@@ -8,9 +8,12 @@ function print_usage() {
     echo "  commit <commit-message>     Adds and commits the current changes"
     echo "  force-state                 Overwrites dwarf fortress save files with"
     echo "                                  repository state"
+    echo "  get-binary-path             Returns the configured binary path (see setup)"
     echo "  help                        Prints this help screen"
     echo "  pull                        Updates the repository with remote changes"
     echo "  push                        Uploads changes to the remote repository"
+    echo "  setup <df-binary-path>      Configure Dwarf Fortress binary location."
+    echo "                                  This will be stored in ~/.df-git-binary-path"
     echo "  upgrade-config              Re-creates the dwarf fortress directory and"
     echo "                                  re-installs save files"
     echo
@@ -31,6 +34,36 @@ if [[ $# -eq 0 ]] || [[ "$1" == "help" ]]; then
     exit 1
 fi
 
+# Determine installation directory
+DF_BINARY_PATH_FILE="${HOME}/.df-git-binary-path"
+function setup_binary_path() {
+    path="$1"
+    if [[ ! -f $path ]]; then
+        echo "$path is not a file."
+    else
+        if [[ -x $path ]]; then
+            echo "$path" > $DF_BINARY_PATH_FILE
+        else
+            echo "$path is not an executable file."
+        fi
+    fi
+}
+if [[ -e $DF_BINARY_PATH_FILE ]]; then
+    DF_BIN=$(cat $DF_BINARY_PATH_FILE)
+else
+    ARCH_BIN="/usr/bin/dwarffortress"
+    if [[ -f $ARCH_BIN && -x $ARCH_BIN ]]; then
+        echo "Found $ARCH_BIN, configuring df-git..."
+        setup_binary_path $ARCH_BIN
+        DF_BIN="$ARCH_BIN"
+    else
+        echo "Could not find Dwarf Fortress binary."
+        echo "Please configure binary location using:"
+        echo "  $0 setup <df-binary-path>"
+        exit 1
+    fi
+fi
+
 ##
 ## Variables, aliases, and helper functions
 ##
@@ -38,7 +71,6 @@ DF_DIR_NAME=".dwarffortress"
 DF_DIR="${HOME}/${DF_DIR_NAME}/"
 DF_GIT_DIR_NAME=".df-git"
 DF_GIT_DIR="${HOME}/${DF_GIT_DIR_NAME}/"
-DF_BIN="dwarffortress"
 alias cp="cp -v"
 alias mv="mv -v"
 alias rm="rm -Iv"
@@ -141,6 +173,13 @@ case "$cmd" in
     fi
     install_df_git_files
     ;;
+"get-binary-path")
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: $0 $cmd"
+        exit 1
+    fi
+    echo $DF_BIN
+    ;;
 # PULL UPDATES FROM CURRENT BRANCH
 "pull")
     if [[ $# -ne 1 ]]; then
@@ -167,6 +206,16 @@ case "$cmd" in
     cd "${DF_GIT_DIR}"
     current_branch=$(get_current_branch)
     git push origin ${current_branch}
+    ;;
+# SETUP DWARF FORTRESS BINARY LOCATION
+"setup")
+    if [[ $# -ne 2 ]]; then
+        echo "Usage $0 $cmd <df-binary-path>"
+        exit 1
+    fi
+    binary_path="$2"
+    echo "Configuation binary path $binary_path..."
+    setup_binary_path $binary_path
     ;;
 # RECREATE DWARF FORTRESS CONFIGURATION
 "upgrade-config")
