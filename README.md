@@ -1,7 +1,7 @@
 df-git
 ======
 
-`df-git` maintains and sychronizes your Dwarf Fortress save files by keeping
+`df-git` maintains and synchronizes your Dwarf Fortress save files by keeping
 track of changes in a git repository.  Two scripts are provided to accomplish
 this `df-git.sh` and `df-start.sh`.
 
@@ -40,15 +40,20 @@ export PATH="$PATH:/path/to/df-git/"
 Using df-git
 ------------
 
-The first time you use df-git, it will attempt to find the Dwarf Fortress
-binary.  If you have installed it manually it will likely print an error telling
+The first time you use `df-git`, it will attempt to find your Dwarf Fortress
+files.  If you have installed it manually it will likely print an error telling
 you to configure it, which you can do with the following command:
 
-    $ df-git.sh setup /path/to/df-binary
+    $ df-git.sh setup install /path/to/df-files
 
-Once df-git knows the binary location, you will want to create a remote
-repository (preferably one you can access from anywhere).  Once this is created
-you can clone it using:
+This should automatically locate the default `df` script.  If it does not, or if
+you want to use a custom script, you can you the following command to set it up:
+
+    $ df-git.sh setup binary /path/to/start-script
+
+Once `df-git` knows the install and binary locations, you will want to create a
+remote repository (preferably one you can access from anywhere).  Once this is
+created you can clone it using:
 
     $ df-git.sh clone <repo-location>
 
@@ -76,13 +81,14 @@ If you have multiple computers, setting up `df-git` and using `df-start.sh` to
 run Dwarf Fortress every time will ensure that you always have the most recent
 version of your fortress.
 
-***upgrade-config***
+***upgrade-config (Arch Linux only)***
 
 The `upgrade-config` command automates the process for restarting configuration
 after an upgrade to Dwarf Fortress.  The .dwarffortress directory is deleted
 and Dwarf Fortress is started briefly, allowing the new version's
-configuration files to be copied into place.  Any save files currently being
-tracked by `df-git` will then be copied into place.
+configuration files to be copied into place by the Arch Linux start script.
+Any save files currently being tracked by `df-git` will then be copied into
+place.
 
 Assuming `df-git` is already set up and in sync, the following commands should
 start up Dwarf Fortress with new configuration and your old save files:
@@ -92,8 +98,9 @@ $ df-git.sh upgrade-config
 $ df-start.sh
 ```
 
-That said, this is heavily dependent on specific functionality and may be an
-opportunity for real-world [Fun](http://dwarffortresswiki.org/index.php/DF2014:Fun).
+That said, this is heavily dependent on Arch-Linux-specific functionality
+and on other systems may only be useful as an opportunity for real-world
+[Fun](http://dwarffortresswiki.org/index.php/DF2014:Fun).
 
 ***force-state***
 
